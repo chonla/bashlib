@@ -25,6 +25,8 @@ And source `./lib/all.sh` to main bash.
 APP_NAME=my-script # Your script name, whatever. This will be used in logging.
 APP_VERSION="1.2.1" # Your script version.
 
+source ./lib/all.sh
+
 parse_env # Parse .env file
 
 for arg in "$@"
