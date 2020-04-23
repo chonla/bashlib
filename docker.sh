@@ -81,3 +81,54 @@ clear_image_cache() {
         docker image rm "${img}"
     done
 }
+
+down_current_docker_container() {
+    local service=$1
+    log "bring service `is_info ${service}` down"
+    docker-compose down
+}
+
+down_docker_container() {
+    local service=$1
+    
+    log "shutdown service `is_info ${service}`"
+    
+    cd "docker/${service}"
+    
+    down_current_docker_container $service
+    
+    cd "../.."
+}
+
+ensure_docker_container() {
+    local service=$1
+    local cwd=`pwd`
+    
+    log "ensuring service `is_info ${service}`"
+    
+    cd "docker/${service}"
+    
+    if [ $DOWN_CONTAINER_BEFORE_UP == 1 ]; then
+        down_current_docker_container $service
+    fi
+    
+    bash -c "./up.sh"
+    cd $cwd
+}
+
+down_docker_network() {
+    local network=$1
+    if [ `docker network ls -q -f name="${network}"` ]; then
+        log "remove network: ${network}"
+        docker network rm "${network}"
+    fi
+}
+
+ensure_docker_network() {
+    local network=$1
+    
+    if [ ! `docker network ls -q -f name="${network}"` ]; then
+        log "create network: ${network}"
+        docker network create "${network}"
+    fi
+}
