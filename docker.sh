@@ -6,7 +6,7 @@ docker_login() {
     
     if [[ "${user}" != "" ]] && [[ "${password}" != "" ]]; then
         log "loggin into docker registry"
-        echo "${password}" | docker login -u "${user}" --password-stdin
+        echo "${password}" | docker login -u "${user}" --password-stdin ${DOCKERHUB_SERVER}
     fi
 }
 
@@ -23,7 +23,7 @@ build_image() {
         log "building `is_info ${img_id}:${tag}` from `is_info ${dockerfile}`"
         docker build --build-arg VERSION=${tag} -t "${img_id}:${tag}" -f "${dockerfile}" .
         IMAGE_CACHE+=("${img_id}:${tag}")
-
+        
         # tag the rest
         for t in "${additional_tags[@]}"
         do
@@ -36,11 +36,35 @@ build_image() {
     fi
 }
 
+push_image() {
+    local registry_base=${DOCKERHUB_SERVER}
+    
+    if [[ ! -z $registry_base ]]; then
+        registry_base="${registry_base}/"
+    fi
+
+    local img_id=$1
+    shift
+    declare -a tags_list=("$@")
+    
+    for t in "${tags_list[@]}"
+    do
+        log "pushing `is_info ${registry_base}${img_id}:${tag}`"
+        docker push "${registry_base}${img_id}:${tag}"
+    done
+}
+
 push_images() {
+    local registry_base=${DOCKERHUB_SERVER}
+    
+    if [[ ! -z $registry_base ]]; then
+        registry_base="${registry_base}/"
+    fi
+    
     for img in "${IMAGE_CACHE[@]}"
     do
         log "pushing `is_info ${img}`"
-        docker push "${img}"
+        docker push "${registry_base}${img}"
     done
 }
 

@@ -6,3 +6,4 @@ source ./lib/friendly.sh
 source ./lib/docker.sh
 source ./lib/dockerhub.sh
 source ./lib/git.sh
+source ./lib/notification.sh
