@@ -18,18 +18,24 @@ build_image() {
     local tag=${tags_list[0]}
     local additional_tags=("${tags_list[@]:1}")
     local dockerfile="${name}.Dockerfile"
+
+    local registry_base=${DOCKERHUB_SERVER}
+    
+    if [[ ! -z $registry_base ]]; then
+        registry_base="${registry_base}/"
+    fi
     
     if [[ -f $dockerfile ]]; then
-        log "building `is_info ${img_id}:${tag}` from `is_info ${dockerfile}`"
-        docker build --build-arg VERSION=${tag} -t "${img_id}:${tag}" -f "${dockerfile}" .
-        IMAGE_CACHE+=("${img_id}:${tag}")
+        log "building `is_info ${registry_base}${img_id}:${tag}` from `is_info ${dockerfile}`"
+        docker build --build-arg VERSION=${tag} -t "${registry_base}${img_id}:${tag}" -f "${dockerfile}" .
+        IMAGE_CACHE+=("${registry_base}${img_id}:${tag}")
         
         # tag the rest
         for t in "${additional_tags[@]}"
         do
-            log "tagging `is_info ${img_id}:${t}` from `is_info ${img_id}:${tag}`"
-            docker tag "${img_id}:${tag}" "${img_id}:${t}"
-            IMAGE_CACHE+=("${img_id}:${t}")
+            log "tagging `is_info ${registry_base}${img_id}:${t}` from `is_info ${registry_base}${img_id}:${tag}`"
+            docker tag "${registry_base}${img_id}:${tag}" "${registry_base}${img_id}:${t}"
+            IMAGE_CACHE+=("${registry_base}${img_id}:${t}")
         done
     else
         warning_log "cannot find `is_info ${dockerfile}` ... `is_error skipped`"
@@ -47,7 +53,7 @@ push_image() {
     shift
     declare -a tags_list=("$@")
     
-    for t in "${tags_list[@]}"
+    for tag in "${tags_list[@]}"
     do
         log "pushing `is_info ${registry_base}${img_id}:${tag}`"
         docker push "${registry_base}${img_id}:${tag}"

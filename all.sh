@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ฺBASHLIB_VERSION="1.0.0"
+ฺBASHLIB_VERSION="1.0.1"
 
 source ./lib/color.sh
 source ./lib/common.sh
