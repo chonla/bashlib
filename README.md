@@ -4,9 +4,9 @@ Just a bash library for doing several bash-scripting for myself.
 
 ## Requirement
 
-* git
-* docker
-* jq
+* git - for doing git things.
+* docker - for doing docker things.
+* jq - several scripts use jq to read JSON. See [https://stedolan.github.io/jq/](https://stedolan.github.io/jq/) for installation.
   
 
 ## Usage
